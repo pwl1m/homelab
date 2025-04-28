@@ -1,0 +1,22 @@
+# Arquivos temporários
+*.retry
+
+# Diretórios sensíveis
+vault_pass.txt
+*.key
+*.pem
+
+# Logs
+*.log
+
+# Configurações locais
+*.swp
+*.swo
+*.swn
+*.bak
+*.tmp
+
+# Pastas específicas
+__pycache__/
+.env/
+.cache/
