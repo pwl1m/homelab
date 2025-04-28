@@ -30,3 +30,4 @@ homelab/
     ├── .gitignore          # Arquivos ignorados pelo Git
     └── README.md           # Documentação do projeto
 # homelab
+# homelab
