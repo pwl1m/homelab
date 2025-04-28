@@ -15,9 +15,9 @@ vault_pass.txt
 *.swn
 *.bak
 *.tmp
+*.zip
 
 # Pastas específicas
 __pycache__/
 .env/
 .cache/
-*.zip
