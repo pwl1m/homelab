@@ -29,5 +29,3 @@ homelab/
     ├── templates/          # Templates Jinja2 para configuração dinâmica
     ├── .gitignore          # Arquivos ignorados pelo Git
     └── README.md           # Documentação do projeto
-# homelab
-# homelab

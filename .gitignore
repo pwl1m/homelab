@@ -20,3 +20,4 @@ vault_pass.txt
 __pycache__/
 .env/
 .cache/
+.zip
