@@ -1,0 +1,59 @@
+---
+- hosts: localhost
+  become: yes
+  vars:
+    prometheus_dir: "/opt/monitoring/prometheus"
+    grafana_dir: "/opt/monitoring/grafana"
+
+  tasks:
+    - name: Criar diretórios para dados persistentes
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: pi
+        group: pi
+      loop:
+        - "{{ prometheus_dir }}/data"
+        - "{{ grafana_dir }}/data"
+
+    - name: Criar arquivo de configuração do Prometheus
+      copy:
+        dest: "{{ prometheus_dir }}/prometheus.yml"
+        content: |
+          global:
+            scrape_interval: 60s
+          
+          scrape_configs:
+            - job_name: 'node'
+              static_configs:
+                - targets: ['localhost:9100']
+
+    - name: Iniciar Node Exporter
+      community.docker.docker_container:
+        name: node-exporter
+        image: prom/node-exporter:v1.6.1
+        ports:
+          - "9100:9100"
+        restart_policy: unless-stopped
+
+    - name: Iniciar Prometheus
+      community.docker.docker_container:
+        name: prometheus
+        image: prom/prometheus:v2.47.0
+        ports:
+          - "9090:9090"
+        volumes:
+          - "{{ prometheus_dir }}/prometheus.yml:/etc/prometheus/prometheus.yml"
+          - "{{ prometheus_dir }}/data:/prometheus"
+        command: "--config.file=/etc/prometheus/prometheus.yml --storage.tsdb.retention.time=7d"
+        restart_policy: unless-stopped
+
+    - name: Iniciar Grafana
+      community.docker.docker_container:
+        name: grafana
+        image: grafana/grafana:9.5.15
+        ports:
+          - "3000:3000"
+        volumes:
+          - "{{ grafana_dir }}/data:/var/lib/grafana"
+        restart_policy: unless-stopped

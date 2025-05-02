@@ -1,0 +1,49 @@
+# playbooks/infrastructure/docker-setup.yml
+---
+- name: Instalar pré-requisitos Docker
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Instalar dependências
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg
+        - lsb-release
+
+    - name: Adicionar chave GPG oficial do Docker
+      apt_key:
+        url: https://download.docker.com/linux/raspbian/gpg
+        state: present
+
+    - name: Adicionar repositório Docker
+      apt_repository:
+        repo: "deb [arch=armhf] https://download.docker.com/linux/raspbian {{ ansible_distribution_release }} stable"
+        state: present
+        filename: docker-ce
+
+    - name: Instalar Docker CE
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+
+    - name: Adicionar usuário pi ao grupo docker
+      user:
+        name: pi
+        groups: docker
+        append: yes
+
+    - name: Habilitar serviço Docker
+      systemd:
+        name: docker
+        enabled: yes
+        state: started

@@ -1,0 +1,29 @@
+---
+- hosts: localhost
+  become: yes
+  tasks:
+    - name: Criar diretório de configuração
+      file:
+        path: /home/pi/.config/glances
+        state: directory
+
+    - name: Configuração segura do Glances
+      copy:
+        dest: /home/pi/.config/glances/glances.conf
+        content: |
+          [global]
+          bind=192.168.1.11
+          port=61208
+          allow=192.168.1.0/24
+
+    - name: Executar Glances via Docker
+      docker_container:
+        name: glances
+        image: nicolargo/glances:latest-full
+        ports:
+          - "61208:61208"
+        volumes:
+          - "/home/pi/.config/glances/glances.conf:/etc/glances.conf:ro"
+        command: glances -w -C /etc/glances.conf
+        restart_policy: unless-stopped
+        detach: yes

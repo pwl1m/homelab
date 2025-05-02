@@ -1,0 +1,25 @@
+- name: Subir container Nginx via Docker Compose
+  hosts: localhost
+  become: true
+
+  tasks:
+    - name: Criar diretório para Nginx
+      file:
+        path: /opt/nginx
+        state: directory
+
+    - name: Criar arquivo docker-compose.yml do Nginx
+      copy:
+        dest: /opt/nginx/docker-compose.yml
+        content: |
+          version: '3'
+          services:
+            nginx:
+              image: nginx:alpine
+              ports:
+                - "80:80"
+
+    - name: Subir Nginx com Docker Compose
+      shell: docker-compose up -d
+      args:
+        chdir: /opt/nginx

@@ -1,0 +1,39 @@
+- name: Instalar Docker e Docker Compose
+  hosts: localhost
+  become: true
+
+  tasks:
+    - name: Adicionar chave GPG oficial do Docker
+      apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+
+    - name: Adicionar repositório do Docker
+      apt_repository:
+        repo: deb [arch=arm64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
+        state: present
+        filename: docker
+
+    - name: Atualizar cache de pacotes
+      apt:
+        update_cache: yes
+
+    - name: Instalar Docker
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+
+    - name: Adicionar usuário atual ao grupo docker
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+
+    - name: Instalar Docker Compose binário (ARM64)
+      get_url:
+        url: https://github.com/docker/compose/releases/latest/download/docker-compose-linux-aarch64
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'

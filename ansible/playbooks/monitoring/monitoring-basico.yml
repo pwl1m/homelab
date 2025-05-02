@@ -1,0 +1,36 @@
+---
+- hosts: localhost
+  become: yes
+  tasks:
+    # Instala o Glances (mais leve que Netdata para seu Pi 3B)
+    - name: Instalar Glances + dependências
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop:
+        - glances
+        - python3-pip
+
+    # Habilita modo web (opcional)
+    - name: Configurar serviço Glances
+      copy:
+        dest: /etc/systemd/system/glances.service
+        content: |
+          [Unit]
+          Description=Glances
+          After=network.target
+
+          [Service]
+          ExecStart=/usr/bin/glances -w
+          Restart=on-failure
+          User=pi
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Iniciar e habilitar Glances
+      systemd:
+        name: glances
+        enabled: yes
+        state: started

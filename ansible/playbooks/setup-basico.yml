@@ -1,4 +1,4 @@
-- name: Configurar Raspberry Pi
+- name: Atualizar sistema e instalar pacotes básicos
   hosts: localhost
   become: true
 
@@ -15,4 +15,9 @@
           - curl
           - git
           - unzip
+          - wget
+          - gnupg
+          - lsb-release
+          - ca-certificates
+          - apt-transport-https
         state: present

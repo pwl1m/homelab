@@ -1,0 +1,37 @@
+---
+- name: Adicionar chave GPG oficial do Docker
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+
+- name: Adicionar repositório do Docker
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=arm64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+    filename: docker
+    state: present
+
+- name: Atualizar cache do APT
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Instalar Docker Engine e dependências
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+
+- name: Adicionar usuário atual ao grupo docker
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
+
+- name: Habilitar e iniciar o serviço Docker
+  ansible.builtin.systemd:
+    name: docker
+    enabled: yes
+    state: started
